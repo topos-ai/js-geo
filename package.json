@@ -1,10 +1,12 @@
 {
   "name": "@topos-ai/geo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,12 @@
   "bugs": {
     "url": "https://github.com/topos-ai/js-geo/issues"
   },
-  "homepage": "https://github.com/topos-ai/js-geo#readme"
+  "homepage": "https://github.com/topos-ai/js-geo#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  },
+  "files": [
+    "dist"
+  ]
 }
