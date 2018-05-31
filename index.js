@@ -1,9 +1,15 @@
+import r2 from './r2'
+import r3 from './r3'
+import s1 from './s1'
+
+
 const lookupBits = 4
 const swapMask   = 0x01
 const invertMask = 0x02
 const maxLevel = 30
-const degree = Math.PI / 180
 const maxSize = 1 << maxLevel
+
+
 
 const ntz8tab = new Uint8Array([
 	0x08, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01, 0x00,
@@ -157,45 +163,19 @@ function sizeIJ(level) {
 	return 1 << (maxLevel-level)
 }
 
-class r2Point {
-	constructor(x, y) {
-		this.x = x
-		this.y = y
-	}
-}
-
-class r2Rect {
-	constructor(lo, hi) {
-		this.lo = lo
-		this.hi = hi
-	}
-
-	vertex(k) {
-		switch (k%4) {
-		case 0:
-			return new r2Point(this.lo.x, this.lo.y)
-		case 1:
-			return new r2Point(this.hi.x, this.lo.y)
-		case 2:
-			return new r2Point(this.hi.x, this.hi.y)
-		case 3:
-			return new r2Point(this.lo.x, this.hi.y)
-		}
-	}
-}
 
 function ijLevelToBoundUV(i, j, level) {
 	const cellSize = sizeIJ(level)
 	const xLo = i & -cellSize
 	const yLo = j & -cellSize
 
-	return new r2Rect(
-		new r2Point(stToUV(ijToSTMin(xLo)), stToUV(ijToSTMin(yLo))),
-		new r2Point(stToUV(ijToSTMin(xLo + cellSize)), stToUV(ijToSTMin(yLo + cellSize)))
+	return new r2.Rect(
+		new r2.Point(stToUV(ijToSTMin(xLo)), stToUV(ijToSTMin(yLo))),
+		new r2.Point(stToUV(ijToSTMin(xLo + cellSize)), stToUV(ijToSTMin(yLo + cellSize)))
 	)
 }
 
-class r3Vector {
+class r3.Vector {
 	constructor(x, y, z) {
 		this.x = x
 		this.y = y
@@ -212,13 +192,13 @@ class r3Vector {
 	}
 
 	mul(m) {
-		return new r3Vector(this.x*m, this.y*m, this.z*m)
+		return new r3.Vector(this.x*m, this.y*m, this.z*m)
 	}
 
 	normalize() {
 		const n2 = this.norm2()
 		if (n2 == 0) {
-			return r3Vector(0, 0, 0)
+			return r3.Vector(0, 0, 0)
 		}
 
 		return this.mul(1 / Math.sqrt(n2))
@@ -228,36 +208,28 @@ class r3Vector {
 function faceUVToXYZ(face, u, v) {
 	switch (face) {
 	case 0:
-		return new r3Vector(1, u, v)
+		return new r3.Vector(1, u, v)
 	case 1:
-		return new r3Vector(-u, 1, v)
+		return new r3.Vector(-u, 1, v)
 	case 2:
-		return new r3Vector(-u, -v, 1)
+		return new r3.Vector(-u, -v, 1)
 	case 3:
-		return new r3Vector(-1, -v, -u)
+		return new r3.Vector(-1, -v, -u)
 	case 4:
-		return new r3Vector(v, -1, -u)
+		return new r3.Vector(v, -1, -u)
 	default:
-		return new r3Vector(v, u, -1)
+		return new r3.Vector(v, u, -1)
 	}
 }
 
-class s1Angle {
-	constructor(radians) {
-		this.radians = radians
-	}
 
-	degrees() {
-		return this.radians / degree
-	}
-}
 
 function latitude(p) {
-	return new s1Angle(Math.atan2(p.vector.z, Math.sqrt(p.vector.x*p.vector.x+p.vector.y*p.vector.y)))
+	return new s1.Angle(Math.atan2(p.vector.z, Math.sqrt(p.vector.x*p.vector.x+p.vector.y*p.vector.y)))
 }
 
 function longitude(p)  {
-	return new s1Angle(Math.atan2(p.vector.y, p.vector.x))
+	return new s1.Angle(Math.atan2(p.vector.y, p.vector.x))
 }
 
 class LatLng {
@@ -292,7 +264,6 @@ const exported = {
 	Cell,
 	CellID,
 	LatLng,
-	Point,
 }
 
 export default exported
