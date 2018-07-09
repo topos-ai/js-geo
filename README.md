@@ -1,7 +1,10 @@
-# @topos-ai/geo
+# geo
 
-A fast, pure JavaScript implementation of S2 built to work in the browser with
-no dependencies.
+A fast ES6 JavaScript implementation of S2 built to work in the browser with no
+dependencies.
+
+The code closely follows the [Go port](https://github.com/golang/geo) of the S2
+library.
 
 ## Installation
 
