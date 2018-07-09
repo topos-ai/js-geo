@@ -1,4 +1,4 @@
-export class Vector {
+class Vector {
 	constructor(x, y, z) {
 		this.X = x
 		this.Y = y
@@ -26,3 +26,5 @@ export class Vector {
 		return this.Mul(1 / Math.sqrt(n2))
 	}
 }
+
+export {Vector}

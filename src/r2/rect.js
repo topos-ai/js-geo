@@ -1,11 +1,11 @@
-export class Point {
+class Point {
 	constructor(x, y) {
 		this.X = x
 		this.Y = y
 	}
 }
 
-export class Rect {
+class Rect {
 	constructor(lo, hi) {
 		this.lo = lo
 		this.hi = hi
@@ -24,3 +24,5 @@ export class Rect {
 		}
 	}
 }
+
+export {Point, Rect}

@@ -1,7 +1,7 @@
-import * as bits from './bits'
-import * as r2 from './r2'
-import * as r3 from './r3'
-import * as s1 from './s1'
+import TrailingZeros8 from '../bits'
+import r2 from '../r2'
+
+import {stToUV} from './stuv.js'
 
 const maxLevel = 30
 const maxSize = 1 << maxLevel
@@ -305,7 +305,7 @@ const hex8tab = [
 	'ff',
 ]
 
-export class CellID {
+class CellID {
 	constructor(bytes) {
 		this.bytes = new Uint8Array(bytes)
 	}
@@ -337,7 +337,7 @@ export class CellID {
 	}
 
 	Level() {
-		return 30 - ((64 - (this.bytes.length<<3) + bits.TrailingZeros8(this.lastByte()))>>1)
+		return 30 - ((64 - (this.bytes.length<<3) + TrailingZeros8(this.lastByte()))>>1)
 	}
 
 	Face() {
@@ -397,21 +397,13 @@ export class CellID {
 	}
 }
 
-export function CellIDFromToken(token) {
+function CellIDFromToken(token) {
 	const bytes = new Uint8Array((token.length+1)>>1)
 	for (const i in token) {
 		bytes[i>>1] |= parseInt(token[i], 16)<<((i&1^1)<<2)
 	}
 
 	return new CellID(bytes)
-}
-
-function stToUV(s) {
-	if (s >= 0.5) {
-		return (1 / 3) * (4*s*s - 1)
-	}
-
-	return (1 / 3) * (1 - 4*(1-s)*(1-s))
 }
 
 function ijToSTMin(i) {
@@ -432,55 +424,4 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-function faceUVToXYZ(face, u, v) {
-	switch (face) {
-	case 0:
-		return new r3.Vector(1, u, v)
-	case 1:
-		return new r3.Vector(-u, 1, v)
-	case 2:
-		return new r3.Vector(-u, -v, 1)
-	case 3:
-		return new r3.Vector(-1, -v, -u)
-	case 4:
-		return new r3.Vector(v, -1, -u)
-	default:
-		return new r3.Vector(v, u, -1)
-	}
-}
-
-function latitude(p) {
-	return new s1.Angle(Math.atan2(p.Vector.Z, Math.sqrt(p.Vector.X*p.Vector.X+p.Vector.Y*p.Vector.Y)))
-}
-
-function longitude(p)  {
-	return new s1.Angle(Math.atan2(p.Vector.Y, p.Vector.X))
-}
-
-export class LatLng {
-	constructor(point) {
-		this.Latitude = latitude(point)
-		this.Longitude = longitude(point)
-	}
-}
-
-export class Point {
-	constructor(vector) {
-		this.Vector = vector
-	}
-}
-
-export class Cell {
-	constructor(id) {
-		this.id = id
-		const [f, i, j, o] = id.faceIJOrientation()
-		this.face = f
-		this.level = id.Level()
-		this.orientation = o
-		this.uv = ijLevelToBoundUV(i, j, this.level)
-	}
-
-	Vertex(k) {
-		return new Point(faceUVToXYZ(this.face, this.uv.Vertex(k).X, this.uv.Vertex(k).Y).Normalize())
-	}
-}
+export {CellID, CellIDFromToken, ijLevelToBoundUV}

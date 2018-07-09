@@ -1,5 +1,6 @@
 import assert from 'assert'
-import * as s2 from '../src/s2'
+import {s2} from '../src'
+
 
 describe('CellIDFromToken()', function() {
 	const nominalCases = [

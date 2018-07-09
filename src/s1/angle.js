@@ -1,6 +1,6 @@
 const degree = Math.PI / 180
 
-export class Angle {
+class Angle {
 	constructor(radians) {
 		this.Radians = radians
 	}
@@ -9,3 +9,5 @@ export class Angle {
 		return this.Radians / degree
 	}
 }
+
+export {Angle}
