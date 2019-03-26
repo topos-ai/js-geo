@@ -25,4 +25,46 @@ function faceUVToXYZ(face, u, v) {
 	}
 }
 
-export {stToUV, faceUVToXYZ}
+function face(vector) {
+	const f = vector.LargestComponent()
+	if ((f == r3.Axis.X && vector.X < 0) || (f == r3.Axis.Y && vector.Y < 0) || f == r3.Axis.Z && vector.Z < 0) {
+		return f+3
+	}
+
+	return f
+}
+
+function xyzToFaceUV(vector) {
+	const f = face(vector)
+	const [u, v] = validFaceXYZToUV(f, vector)
+	return [f, u, v]
+}
+
+function validFaceXYZToUV(face, vector){
+	switch (face) {
+		case 0:
+			return [vector.Y / vector.X, vector.Z / vector.X]
+		case 1:
+			return [-vector.X / vector.Y, vector.Z / vector.Y]
+		case 2:
+			return [-vector.X / vector.Z, -vector.Y / vector.Z]
+		case 3:
+			return [vector.Z / vector.X, vector.Y / vector.X]
+		case 4:
+			return [vector.Z / vector.Y, -vector.X / vector.Y]
+	}
+
+	return [-vector.Y / vector.Z, -vector.X / vector.Z]
+}
+
+function uvToST(u) {
+	if (u >= 0) {
+		return 0.5 * Math.sqrt(1 + 3 * u)
+	}
+
+	return 1 - 0.5 * Math.sqrt(1 - 3 * u)
+}
+
+
+export {stToUV, faceUVToXYZ, xyzToFaceUV, uvToST}
+

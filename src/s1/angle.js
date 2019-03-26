@@ -10,4 +10,4 @@ class Angle {
 	}
 }
 
-export {Angle}
+export { Angle, degree }

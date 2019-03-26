@@ -1,6 +1,7 @@
-import {Vector} from './vector'
+import {Axis, Vector} from './vector'
 
 const exported = {
+	Axis,
 	Vector,
 }
 

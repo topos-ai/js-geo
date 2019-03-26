@@ -1,10 +1,14 @@
 import TrailingZeros8 from '../bits'
 import r2 from '../r2'
+import { xyzToFaceUV, uvToST} from './stuv.js'
+import { PointFromLatLng} from './point.js'
+import {clampInt} from './util.js'
+import { LatLngFromDegrees} from './latlng.js'
 
-import {stToUV} from './stuv.js'
 
 const maxLevel = 30
 const maxSize = 1 << maxLevel
+const posBits = 2 * maxLevel + 1
 
 const posToIJ = [
 	[0, 1, 3, 2], // canonical order:    (0,0), (0,1), (1,1), (1,0)
@@ -397,6 +401,89 @@ class CellID {
 	}
 }
 
+// // cellIDFromPoint returns a leaf cell containing point p. Usually there is
+// // exactly one such cell, but for points along the edge of a cell, any
+// // adjacent cell may be (deterministically) chosen. This is because
+// // s2.CellIDs are considered to be closed sets. The returned cell will
+// // always contain the given point, i.e.
+// //
+// //   CellFromPoint(p).ContainsPoint(p)
+// //
+// // is always true.
+// func cellIDFromPoint(p Point) CellID {
+// 	f, u, v := xyzToFaceUV(r3.Vector{ p.X, p.Y, p.Z })
+// 	i:= stToIJ(uvToST(u))
+// 	j:= stToIJ(uvToST(v))
+// 	return cellIDFromFaceIJ(f, i, j)
+// }
+
+
+function CellIDFromPoint(point) {
+	const [f, u, v] = xyzToFaceUV(point.Vector)
+	const i = stToIJ(uvToST(u))
+	const j = stToIJ(uvToST(v))
+
+	return cellIDFromFaceIJ(f, i, j)
+}
+
+CellIDFromPoint(PointFromLatLng(new LatLngFromDegrees(40, -70)))
+
+function stToIJ(s) {
+	return clampInt(Math.floor(maxSize * s), 0, maxSize - 1)
+}
+
+
+// func cellIDFromFaceIJ(f, i, j int) CellID {
+// 	// Note that this value gets shifted one bit to the left at the end
+// 	// of the function.
+// 	n:= uint64(f) << (posBits - 1)
+// 	// Alternating faces have opposite Hilbert curve orientations; this
+// 	// is necessary in order for all faces to have a right-handed
+// 	// coordinate system.
+// 	bits:= f & swapMask
+// 	// Each iteration maps 4 bits of "i" and "j" into 8 bits of the Hilbert
+// 	// curve position.  The lookup table transforms a 10-bit key of the form
+// 	// "iiiijjjjoo" to a 10-bit value of the form "ppppppppoo", where the
+// 	// letters [ijpo] denote bits of "i", "j", Hilbert curve position, and
+// 	// Hilbert curve orientation respectively.
+// 	for k := 7; k >= 0; k-- {
+// 		mask:= (1 << lookupBits) - 1
+// 		bits += int((i >> uint(k * lookupBits)) & mask) << (lookupBits + 2)
+// 		bits += int((j >> uint(k * lookupBits)) & mask) << 2
+// 		bits = lookupPos[bits]
+// 		n |= uint64(bits >> 2) << (uint(k) * 2 * lookupBits)
+// 		bits &= (swapMask | invertMask)
+// 	}
+// 	return CellID(n * 2 + 1)
+// }
+
+
+function cellIDFromFaceIJ(f, i, j) {
+
+	const n = new Uint8Array(8)
+	// n[0] = f << (posBits - 1)
+
+	
+	console.log(f, posBits)
+	console.log(f << (posBits - 1))
+	var bits = f & swapMask
+
+
+	for(var k = 7; k>=0; k--) {
+		const mask = (1 << lookupBits) - 1
+		
+		bits += ((i >> (k * lookupBits)) & mask) << (lookupBits + 2)
+		bits += ((j >> (k * lookupBits)) & mask) << 2
+		bits = lookupPos[bits]
+		n[k] |= (bits >> 2) 
+
+
+		console.log(n[k].toString(2))
+	}
+}
+
+
+
 function CellIDFromToken(token) {
 	const bytes = new Uint8Array((token.length+1)>>1)
 	for (const i in token) {
@@ -424,4 +511,4 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-export {CellID, CellIDFromToken, ijLevelToBoundUV}
+export { CellID, CellIDFromPoint, CellIDFromToken, ijLevelToBoundUV }

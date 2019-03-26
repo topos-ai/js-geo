@@ -9,10 +9,21 @@ function longitude(p)  {
 }
 
 class LatLng {
-	constructor(point) {
-		this.Latitude = latitude(point)
-		this.Longitude = longitude(point)
+	constructor(lat, lng) {
+		this.Latitude = lat
+		this.Longitude = lng
 	}
 }
 
-export {LatLng}
+
+
+function LatLngFromDegrees(lat, lng)  {
+	
+	return new LatLng( new s1.Angle(lat), new s1.Angle(lng) )
+}
+
+function LatLngFromPoint(point) {
+	return new LatLng(latitude(point), longitude(point))
+}
+
+export { LatLng, LatLngFromDegrees, LatLngFromPoint}
