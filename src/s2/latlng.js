@@ -15,15 +15,12 @@ class LatLng {
 	}
 }
 
-
-
 function LatLngFromDegrees(lat, lng)  {
-	
-	return new LatLng( new s1.Angle(lat), new s1.Angle(lng) )
+	return new LatLng(new s1.Angle(lat * s1.degree), new s1.Angle(lng * s1.degree) )
 }
 
 function LatLngFromPoint(point) {
 	return new LatLng(latitude(point), longitude(point))
 }
 
-export { LatLng, LatLngFromDegrees, LatLngFromPoint}
+export { LatLng, LatLngFromDegrees, LatLngFromPoint }

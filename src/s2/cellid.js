@@ -4,7 +4,7 @@ import { xyzToFaceUV, uvToST} from './stuv.js'
 import { PointFromLatLng} from './point.js'
 import {clampInt} from './util.js'
 import { LatLngFromDegrees} from './latlng.js'
-
+import { format } from 'util';
 
 const maxLevel = 30
 const maxSize = 1 << maxLevel
@@ -348,6 +348,15 @@ class CellID {
 		return this.bytes[0]>>5
 	}
 
+	Parent(level) {
+		level <<= 1
+		const bytes = this.bytes.slice(0, (11 + level) >> 3)
+		const bit = 1 << ((60 - level) & 7)
+		const l = bytes.length - 1
+		bytes[l] = bytes[l] & ~ (bit - 1) | bit
+		return new CellID(bytes)
+	}
+
 	faceIJOrientation() {
 		const f = this.Face()
 		var orientation = f & swapMask
@@ -401,115 +410,38 @@ class CellID {
 	}
 }
 
-// // cellIDFromPoint returns a leaf cell containing point p. Usually there is
-// // exactly one such cell, but for points along the edge of a cell, any
-// // adjacent cell may be (deterministically) chosen. This is because
-// // s2.CellIDs are considered to be closed sets. The returned cell will
-// // always contain the given point, i.e.
-// //
-// //   CellFromPoint(p).ContainsPoint(p)
-// //
-// // is always true.
-// func cellIDFromPoint(p Point) CellID {
-// 	f, u, v := xyzToFaceUV(r3.Vector{ p.X, p.Y, p.Z })
-// 	i:= stToIJ(uvToST(u))
-// 	j:= stToIJ(uvToST(v))
-// 	return cellIDFromFaceIJ(f, i, j)
-// }
-
-
 function CellIDFromPoint(point) {
 	const [f, u, v] = xyzToFaceUV(point.Vector)
 	const i = stToIJ(uvToST(u))
 	const j = stToIJ(uvToST(v))
-
 	return cellIDFromFaceIJ(f, i, j)
 }
-
-// CellIDFromPoint(PointFromLatLng(new LatLngFromDegrees(40, -70)))
 
 function stToIJ(s) {
 	return clampInt(Math.floor(maxSize * s), 0, maxSize - 1)
 }
 
-
-// func cellIDFromFaceIJ(f, i, j int) CellID {
-// 	// Note that this value gets shifted one bit to the left at the end
-// 	// of the function.
-// 	n:= uint64(f) << (posBits - 1)
-// 	// Alternating faces have opposite Hilbert curve orientations; this
-// 	// is necessary in order for all faces to have a right-handed
-// 	// coordinate system.
-// 	bits:= f & swapMask
-// 	// Each iteration maps 4 bits of "i" and "j" into 8 bits of the Hilbert
-// 	// curve position.  The lookup table transforms a 10-bit key of the form
-// 	// "iiiijjjjoo" to a 10-bit value of the form "ppppppppoo", where the
-// 	// letters [ijpo] denote bits of "i", "j", Hilbert curve position, and
-// 	// Hilbert curve orientation respectively.
-// 	for k := 7; k >= 0; k-- {
-// 		mask:= (1 << lookupBits) - 1
-// 		bits += int((i >> uint(k * lookupBits)) & mask) << (lookupBits + 2)
-// 		bits += int((j >> uint(k * lookupBits)) & mask) << 2
-// 		bits = lookupPos[bits]
-// 		n |= uint64(bits >> 2) << (uint(k) * 2 * lookupBits)
-// 		bits &= (swapMask | invertMask)
-// 	}
-// 	return CellID(n * 2 + 1)
-// }
-
-
 function cellIDFromFaceIJ(f, i, j) {
-	let bytes = new Uint8Array(8)
-	bytes[0] = f << 4
+	const mask = 15
+	const n = new Uint8Array(8)
+	n[0] = f << 5
+	n[7] = 1
 
-	// let n = BigInt(f) << BigInt(posBits - 1)
-
-	let bits = f & swapMask
-	
-	for(let k = 7; k>=0; k--) {
-		const mask = (1 << lookupBits) - 1
-		bits += ((i >> (k * lookupBits)) & mask) << (lookupBits + 2)
-		bits += ((j >> (k * lookupBits)) & mask) << 2
+	var bits = f & swapMask
+	for(var k = 7; k>=0; k--) {
+		bits |= ((i >> (k << 2)) & mask) << 6
+		bits |= ((j >> (k << 2)) & mask) << 2
 		bits = lookupPos[bits]
-
-		bytes[-(k - 7)] |= (bits >> 2)
-
-		// n |= BigInt(bits >> 2) << BigInt(k * 2 * lookupBits)
+		n[7 - k] |= (bits >> 2) << 1
+		if (k < 7) {
+			n[6-k] |= bits >> 9
+		}
 
 		bits &= (swapMask | invertMask)
 	}
 
-	let carry = 0
-	for (let k = 7; k >= 0; k--) {
-		let byte = bytes[k]
-		let nextCarry = byte >> 7
-		let shiftedByte = byte << 1 | carry
-		carry = nextCarry
-		bytes[k] = shiftedByte
-	}
-
-	bytes[7] += 1
-
-	const binaryBytes = bytes.reduce((str, b) => {
-		return str + b.toString(2).padStart(8, '0')
-	}, '')
-
-	// console.log(binaryBytes)
-	// console.log(n * BigInt(2) + BigInt(1))
-
-	return new CellID(bytes)
+	return new CellID(n)
 }
-
-// CellIDFromLatLng returns the leaf cell containing ll.
-// func CellIDFromLatLng(ll LatLng) CellID {
-// 	return cellIDFromPoint(PointFromLatLng(ll))
-// }
-
-function CellIDFromLatLng(ll) {
-	return CellIDFromPoint(PointFromLatLng(ll))
-}
-
-
 
 function CellIDFromToken(token) {
 	const bytes = new Uint8Array((token.length+1)>>1)
@@ -538,4 +470,4 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-export { CellID, CellIDFromPoint, CellIDFromLatLng, CellIDFromToken, ijLevelToBoundUV }
+export { CellID, CellIDFromPoint, CellIDFromToken }
