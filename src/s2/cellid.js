@@ -426,7 +426,7 @@ function CellIDFromPoint(point) {
 	return cellIDFromFaceIJ(f, i, j)
 }
 
-CellIDFromPoint(PointFromLatLng(new LatLngFromDegrees(40, -70)))
+// CellIDFromPoint(PointFromLatLng(new LatLngFromDegrees(40, -70)))
 
 function stToIJ(s) {
 	return clampInt(Math.floor(maxSize * s), 0, maxSize - 1)
@@ -459,27 +459,54 @@ function stToIJ(s) {
 
 
 function cellIDFromFaceIJ(f, i, j) {
+	let bytes = new Uint8Array(8)
+	bytes[0] = f << 4
 
-	const n = new Uint8Array(8)
-	// n[0] = f << (posBits - 1)
+	// let n = BigInt(f) << BigInt(posBits - 1)
 
+	let bits = f & swapMask
 	
-	console.log(f, posBits)
-	console.log(f << (posBits - 1))
-	var bits = f & swapMask
-
-
-	for(var k = 7; k>=0; k--) {
+	for(let k = 7; k>=0; k--) {
 		const mask = (1 << lookupBits) - 1
-		
 		bits += ((i >> (k * lookupBits)) & mask) << (lookupBits + 2)
 		bits += ((j >> (k * lookupBits)) & mask) << 2
 		bits = lookupPos[bits]
-		n[k] |= (bits >> 2) 
 
+		bytes[-(k - 7)] |= (bits >> 2)
 
-		console.log(n[k].toString(2))
+		// n |= BigInt(bits >> 2) << BigInt(k * 2 * lookupBits)
+
+		bits &= (swapMask | invertMask)
 	}
+
+	let carry = 0
+	for (let k = 7; k >= 0; k--) {
+		let byte = bytes[k]
+		let nextCarry = byte >> 7
+		let shiftedByte = byte << 1 | carry
+		carry = nextCarry
+		bytes[k] = shiftedByte
+	}
+
+	bytes[7] += 1
+
+	const binaryBytes = bytes.reduce((str, b) => {
+		return str + b.toString(2).padStart(8, '0')
+	}, '')
+
+	// console.log(binaryBytes)
+	// console.log(n * BigInt(2) + BigInt(1))
+
+	return new CellID(bytes)
+}
+
+// CellIDFromLatLng returns the leaf cell containing ll.
+// func CellIDFromLatLng(ll LatLng) CellID {
+// 	return cellIDFromPoint(PointFromLatLng(ll))
+// }
+
+function CellIDFromLatLng(ll) {
+	return CellIDFromPoint(PointFromLatLng(ll))
 }
 
 
@@ -511,4 +538,4 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-export { CellID, CellIDFromPoint, CellIDFromToken, ijLevelToBoundUV }
+export { CellID, CellIDFromPoint, CellIDFromLatLng, CellIDFromToken, ijLevelToBoundUV }
