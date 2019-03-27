@@ -66,5 +66,5 @@ function uvToST(u) {
 }
 
 
-export {stToUV, faceUVToXYZ, xyzToFaceUV, uvToST}
+export { stToUV, faceUVToXYZ, xyzToFaceUV, uvToST }
 

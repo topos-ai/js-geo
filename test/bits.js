@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {TrailingZeros8} from '../src/bits'
+import { TrailingZeros8 } from '../src/bits'
 
 describe('TrailingZeros8()', function() {
 	it('undefined for values less than 0', function(){

@@ -14,4 +14,4 @@ function PointFromLatLng(latLng) {
 	return new Point(vector)
 }
 
-export {Point, PointFromLatLng}
+export { Point, PointFromLatLng }

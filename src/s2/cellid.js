@@ -1,14 +1,11 @@
 import TrailingZeros8 from '../bits'
 import r2 from '../r2'
-import { xyzToFaceUV, uvToST} from './stuv.js'
-import { PointFromLatLng} from './point.js'
-import {clampInt} from './util.js'
-import { LatLngFromDegrees} from './latlng.js'
-import { format } from 'util';
+import { xyzToFaceUV, uvToST} from './stuv'
+import { PointFromLatLng } from './point'
+import { clampInt } from './util'
 
 const maxLevel = 30
 const maxSize = 1 << maxLevel
-const posBits = 2 * maxLevel + 1
 
 const posToIJ = [
 	[0, 1, 3, 2], // canonical order:    (0,0), (0,1), (1,1), (1,0)
@@ -410,6 +407,10 @@ class CellID {
 	}
 }
 
+function CellIDFromLatLng(latLng) {
+	return CellIDFromPoint(PointFromLatLng(latLng))
+}
+
 function CellIDFromPoint(point) {
 	const [f, u, v] = xyzToFaceUV(point.Vector)
 	const i = stToIJ(uvToST(u))
@@ -470,4 +471,4 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-export { CellID, CellIDFromPoint, CellIDFromToken }
+export { CellID, CellIDFromLatLng, CellIDFromPoint, CellIDFromToken }

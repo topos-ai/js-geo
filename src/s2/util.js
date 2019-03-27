@@ -11,4 +11,3 @@ function clampInt(x, min, max) {
 }
 
 export { clampInt }
-

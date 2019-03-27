@@ -16,7 +16,7 @@ class LatLng {
 }
 
 function LatLngFromDegrees(lat, lng)  {
-	return new LatLng(new s1.Angle(lat * s1.degree), new s1.Angle(lng * s1.degree) )
+	return new LatLng(new s1.Angle(lat * Math.PI / 180), new s1.Angle(lng * Math.PI / 180) )
 }
 
 function LatLngFromPoint(point) {
