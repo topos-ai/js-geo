@@ -1,8 +1,6 @@
-import {Point, Rect} from './rect'
+import { Point, Rect } from './rect'
 
-const exported = {
+export default {
 	Point,
 	Rect,
 }
-
-export default exported

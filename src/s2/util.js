@@ -10,4 +10,6 @@ function clampInt(x, min, max) {
     return x
 }
 
-export { clampInt }
+export {
+    clampInt,
+}

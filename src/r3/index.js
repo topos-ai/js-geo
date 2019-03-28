@@ -1,8 +1,6 @@
-import {Axis, Vector} from './vector'
+import { Axis, Vector } from './vector'
 
-const exported = {
+export default {
 	Axis,
 	Vector,
 }
-
-export default exported

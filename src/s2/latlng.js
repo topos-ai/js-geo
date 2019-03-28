@@ -23,4 +23,8 @@ function LatLngFromPoint(point) {
 	return new LatLng(latitude(point), longitude(point))
 }
 
-export { LatLng, LatLngFromDegrees, LatLngFromPoint }
+export {
+	LatLng,
+	LatLngFromDegrees,
+	LatLngFromPoint,
+ }

@@ -58,4 +58,7 @@ class Vector {
 	}
 }
 
-export {Axis, Vector}
+export {
+	Axis,
+	Vector,
+}

@@ -3,7 +3,7 @@ import { Cell } from './cell'
 import { Point, PointFromLatLng } from './point'
 import { LatLng, LatLngFromDegrees, LatLngFromPoint } from './latlng'
 
-const exported = {
+export default {
 	Cell,
 	CellID,
 	CellIDFromLatLng,
@@ -15,5 +15,3 @@ const exported = {
 	Point,
 	PointFromLatLng,
 }
-
-export default exported

@@ -65,6 +65,9 @@ function uvToST(u) {
 	return 1 - 0.5 * Math.sqrt(1 - 3 * u)
 }
 
-
-export { stToUV, faceUVToXYZ, xyzToFaceUV, uvToST }
-
+export {
+	faceUVToXYZ,
+	stToUV,
+	uvToST,
+	xyzToFaceUV,
+}

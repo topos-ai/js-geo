@@ -471,4 +471,13 @@ function ijLevelToBoundUV(i, j, level) {
 	)
 }
 
-export { CellID, CellIDFromLatLng, CellIDFromPoint, CellIDFromToken }
+export {
+	CellID,
+	CellIDFromLatLng,
+	CellIDFromPoint,
+	CellIDFromToken,
+	cellIDFromFaceIJ,
+	ijLevelToBoundUV,
+	sizeIJ,
+	stToIJ,
+}

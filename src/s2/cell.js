@@ -1,8 +1,8 @@
-import {Point} from './point'
-import {ijLevelToBoundUV} from './cellid'
-import {faceUVToXYZ} from './stuv'
+import { Point } from './point'
+import { ijLevelToBoundUV } from './cellid'
+import { faceUVToXYZ } from './stuv'
 
-export class Cell {
+class Cell {
 	constructor(id) {
 		this.id = id
 		const [f, i, j, o] = id.faceIJOrientation()
@@ -15,4 +15,8 @@ export class Cell {
 	Vertex(k) {
 		return new Point(faceUVToXYZ(this.face, this.uv.Vertex(k).X, this.uv.Vertex(k).Y).Normalize())
 	}
+}
+
+export {
+	Cell,
 }

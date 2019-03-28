@@ -1,7 +1,5 @@
-import { Angle, degree} from './angle'
+import { Angle } from './angle'
 
-const exported = {
+export default {
 	Angle,
 }
-
-export default exported

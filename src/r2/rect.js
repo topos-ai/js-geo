@@ -25,4 +25,7 @@ class Rect {
 	}
 }
 
-export {Point, Rect}
+export {
+	Point,
+	Rect,
+}

@@ -23,4 +23,6 @@ function TrailingZeros8(x) {
 	return ntz8tab[x]
 }
 
-export { TrailingZeros8 }
+export {
+	TrailingZeros8,
+}
